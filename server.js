@@ -1,62 +1,53 @@
 const express = require('express');
+const storage = require('node-persist');
+const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser')
-let requisições=0;
+
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const books = [
-    {
-        ID: 1,
-        name: 'Codigo Da Vinci',
-        author: 'Dan Brown'
-    },
-    {
-        ID: 2,
-        name: 'Os Lusiadas',
-        author: 'Luis de Camoes'
-    }
-];
+async function getNoticias(){
+    await storage.init();
+    const noticias = await storage.getItem('Noticias');
+    //console.log(noticias);
+    return noticias;
+}
 
-app.get('/books', (req, res) => {
-    requisições++;
-    res.send(books);
-});
-
-app.post('/books', (req, res) => {
-    requisições++;
-    const newBook = req.body;
+async function postNoticias(noticia){
     
-    if (books.findIndex(b => b.ID === newBook.ID) !== -1) {
-        res.status(500).send('Existing book ID');
-        return;
-    }
-
-    books.push(newBook);
-    res.send('Book added');
+    await storage.init();
     
-});
+    const Noticias = await storage.getItem('Noticias');
 
-app.get('/books/:bookId', (req, res) => {
-    requisições++;
-    const bookId = parseInt(req.params.bookId);
-    if (isNaN(bookId)) {
-        res.status(500).send('Non integer');
-        return;
+    if(Noticias == null){
+        await storage.setItem('Noticias',[{ID:0,Titulo:'O inicio',resumo: 'Iniciado',url: 'www.google.com.br'}]);
+    }
+    else{
+        
+        Noticias.push({ID:Noticias.length,Titulo: noticia.Titulo,resumo: noticia.resumo,url: noticia.url});
+        await storage.updateItem('Noticias',Noticias);
+        
     }
 
-    const book = books.find(b => b.ID === bookId);
-    if (!book) {
-        res.status(500).send('Invalid book ID');
-        return;
-    }
+    console.log('Noticia Salva');
+    
+}
 
-    res.send(book);
+app.get('/noticias', (req, res) => {
+    var Note;
+    const noticias = getNoticias();
+    noticias.then(v => {
+        res.send(v); 
+    });
+ 
 });
 
-app.get('/log', (req, res) => {
-    requisições++;
-    res.send('Numero de requisições: '+requisições);
+app.post('/noticias', (req, res) => {
+    const noticia = req.body; 
+    postNoticias(noticia);
+    res.send('Noticia Adicionada');
+    return noticia;
 });
 
 app.listen(3000, () => {
