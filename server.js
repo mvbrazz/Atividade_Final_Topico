@@ -74,13 +74,78 @@ async function postInscricao(e_mail){
     console.log('Email salvo');
 }
 
+async function enviaEmail(IDs,aux){
+
+    await storage.init();
+    // PEGANDO AS NOTICIAS
+    
+    const noticias = await storage.getItem('Noticias');    
+    var noticia = noticias.find(b => b.ID == IDs);
+    var aux1 = noticia;
+
+    // PEGANDO OS EMAILS
+            
+    const emails = await storage.getItem('Email');  
+    var aux2 = emails;
+
+    // CRIANDO O EMAIL 
+    
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
+        port: 587,
+        auth: {
+            user: 'cuho4qjp7jbiyhsz@ethereal.email',
+            pass: 'E3UPQ7qzV9Ee2uXUWx'
+        }
+    });
+    // ENVIANDO O EMAIL
+    const info = await transporter.sendMail({
+        from: 'dpfltysygc66yhqj@ethereal.email',
+        to: aux2[aux].Email,
+        subject: aux1.Titulo,
+        text: aux1.resumo + " " + aux1.url
+    
+    });
+    console.log('mensagem id: ',  info.messageId);
+    console.log('mensagem url: ',  nodemailer.getTestMessageUrl(info));
+    
+
+}
+
+async function getEmail(IDs){
+var aux = 0;
+
+if (isNaN(IDs)) {
+    res.status(500).send('Non integer');
+    return;
+}
+else{
+    await storage.init();    
+    const emails = await storage.getItem('Email');  
+    var aux2 = emails;
+    console.log("Total de emails: " + aux2.length);
+
+    const tempo = setInterval(() => {
+
+        enviaEmail(IDs,aux);
+        aux++;
+        if(aux == aux2.length){
+            aux=0;
+            clearInterval(tempo);
+        }
+
+    }, 2000);
+    return aux2;
+}
+}
+
 app.get('/noticias', (req, res) => {
-    setTimeout(()=> {   // Para pegar o valor que acabou de ser inserido
+   
         const noticias = getNoticias();
         noticias.then(v => {
         res.send(v); 
         }); 
-    },10000); 
+    
 });
 
 app.get('/noticias/:ID', (req, res) => {
@@ -107,80 +172,16 @@ app.post('/inscricao', (req, res) => {
     return email;
 });
 
-async function enviaEmail(IDs,aux){
-
-        await storage.init();
-        // PEGANDO AS NOTICIAS
-        
-        const noticias = await storage.getItem('Noticias');    
-        var noticia = noticias.find(b => b.ID == IDs);
-        var aux1 = noticia;
-
-        // PEGANDO OS EMAILS
-                
-        const emails = await storage.getItem('Email');  
-        var aux2 = emails;
-
-        // CRIANDO O EMAIL 
-        
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.ethereal.email',
-            port: 587,
-            auth: {
-                user: 'cuho4qjp7jbiyhsz@ethereal.email',
-                pass: 'E3UPQ7qzV9Ee2uXUWx'
-            }
-        });
-        // ENVIANDO O EMAIL
-        const info = await transporter.sendMail({
-            from: 'dpfltysygc66yhqj@ethereal.email',
-            to: aux2[aux].Email,
-            subject: aux1.Titulo,
-            text: aux1.resumo + " " + aux1.url
-        
-        });
-        console.log('mensagem id: ',  info.messageId);
-        console.log('mensagem url: ',  nodemailer.getTestMessageUrl(info));
-        
-  
-}
-
-async function getEmail(IDs){
-    var aux = 0;
-
-    if (isNaN(IDs)) {
-        res.status(500).send('Non integer');
-        return;
-    }
-    else{
-        await storage.init();    
-        const emails = await storage.getItem('Email');  
-        var aux2 = emails;
-        console.log("Total de emails: " + aux2.length);
-
-        const tempo = setInterval(() => {
-
-            enviaEmail(IDs,aux);
-            aux++;
-            if(aux == aux2.length){
-                aux=0;
-                clearInterval(tempo);
-            }
-
-        }, 2000);
-        return aux2;
-    }
-}
-
 app.put('/enviar/:ID', (req, res) => {
     
     const IDs = parseInt(req.params.ID); 
     var aux = getEmail(IDs);
-    
-    aux.then(v => {
-        res.send(v); 
-    }); 
 
+    setTimeout(()  => {
+        aux.then(v => {
+            res.send(v); 
+        }); 
+    },14000);
 });
 app.listen(3000, () => {
     console.log(`Example app listening at http://localhost:3000`);
