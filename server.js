@@ -140,22 +140,23 @@ else{
 }
 
 app.get('/noticias', (req, res) => {
-   
+    setTimeout(()=>{
         const noticias = getNoticias();
         noticias.then(v => {
         res.send(v); 
         }); 
-    
+    },1000);
 });
 
 app.get('/noticias/:ID', (req, res) => {
     const IDs = parseInt(req.params.ID);
+    setTimeout(()=>{
     const aux = getNoticiasID(IDs);
 
     aux.then(v => {
         res.send(v);
     });
-
+    },1000);
 });
 
 app.post('/noticias', (req, res) => {
@@ -175,9 +176,10 @@ app.post('/inscricao', (req, res) => {
 app.put('/enviar/:ID', (req, res) => {
     
     const IDs = parseInt(req.params.ID); 
-    var aux = getEmail(IDs);
+    //var aux = getEmail(IDs);
 
     setTimeout(()  => {
+        var aux = getEmail(IDs);
         aux.then(v => {
             res.send(v); 
         }); 
