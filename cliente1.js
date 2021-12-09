@@ -1,5 +1,5 @@
 const axios = require('axios').default;
-
+/*
 setTimeout(() =>{
     axios.post('http://localhost:3000/noticias', {Titulo:'A primeira tentativa',
     resumo: 'Quando foi iniciado o projeto',url: 'www.visualStudio.com.br'})
@@ -54,5 +54,14 @@ setTimeout(() =>{
     .then((response) => {
         console.log(response.data);
     });
-},13000);
+},13000);*/
+/*
+axios.get('http://localhost:3000/noticias/3')
+    .then((response) => {
+        console.log(response.data);
+    });*/
 
+    axios.put('http://localhost:3000/enviar/3')
+    .then((response) => {
+        console.log(response.data);
+    });
