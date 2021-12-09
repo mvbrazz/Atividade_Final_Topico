@@ -20,7 +20,7 @@ async function getNoticias(){
 }
 
 async function postNoticias(noticia){
-    
+     
     await storage.init();
     
     const Noticias = await storage.getItem('Noticias');
@@ -58,12 +58,12 @@ async function postInscricao(e_mail){
 }
 
 app.get('/noticias', (req, res) => {
-
-    const noticias = getNoticias();
-    noticias.then(v => {
+    setTimeout(()=> {   // Para pegar o valor que acabou de ser inserido
+        const noticias = getNoticias();
+        noticias.then(v => {
         res.send(v); 
-    });
- 
+        }); 
+    },10000); 
 });
 
 app.get('/noticias/:ID', (req, res) => {
